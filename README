@@ -1,0 +1,130 @@
+-------------------------------------------------------------------------------
+
+Nume: Serban Bianca-Sanziana
+Email: bianca_serban25@yahoo.com
+Grupa: 325CA
+
+-------------------------------------------------------------------------------
+
+		Tema 3 Client Web. Comunicaţie cu REST API.
+		
+-------------------------------------------------------------------------------		
+
+Proiectul contine:
+- fisierele sursa: - client.cpp
+                  - buffer.cpp buffer.hpp (din laborator, 
+                      modificate pentru c++)
+                  - helpers.cpp helpers.hpp (din laborator,
+                      modificate pentru c++)
+                  - requests.cpp requests.hh
+                  (Am mai adaugat o functie de delete pe langa 
+                  cele 2 functii din laborator)
+- Makefile
+- README
+- folder-ul nlohmann pentru parsarea json
+
+-------------------------------------------------------------------------------
+
+Programul pentru client consta intr-un while infinit in care 
+tratez fiecare comanda citita de la tastatura:
+- register
+- login
+- enter_library
+- get_books
+- get_book
+- add_book
+- delete_book
+- logout
+- exit
+Daca se citeste alt mesaj in afara de acestea se afiseaza un mesaj de eroare.
+
+Pentru output afisez un mesaj corespunzator fiecarei comenzi. 
+Am ales sa nu afisez tot raspunsul de la server deoarece nu s-ar fi inteles
+atat de bine mesajele.
+
+Pentru parsare am ales sa folosesc nlohmann, acesta a fost si motivul pentru
+care am ales sa fac in c++. A fost destul de usor sa parsez mesajul folosind 
+json. Acesta il folosesc la comenzile: 
+- register, login: trimit mesaje de tipul json
+- get_books, get_book: pentru a manipula mesajul pe care il primesc de la 
+server
+- add_book: pentru a forma un mesaj care sa respecte formatul json si care 
+sa il trimit pentru post
+
+Pentru token-ul JWT am ales sa il adaug in functiile de get, post si delete.
+
+Mi-am luat doua variabile, una pentru a contoriza daca user-ul este logat si
+a doua pentru a contoriza daca acesta este intrat in biblioteca. Astfel, afisez
+mesaje de eroare daca nu este respecatata ordinea alegerilor.
+
+-------------------------------------------------------------------------------
+
+Explicare comenzi:
+-> register: 
+  - Daca user-ul nu este logat se citesc username-ul si parola 
+  - Se deschide conexiunea
+  - Trimit mesajul json
+  - Interpretez raspunsul
+  - Daca user-ul este deja logat, nu poate sa inregistreze alt user
+  
+-> login:
+  - Daca user-ul nu este logat se citesc username-ul si parola
+  - Se deschide conexiunea
+  - Trimit mesajul json 
+  - Daca primesc cookie il retin intr-un array de caractere 
+  - Daca user-ul este deja logat, nu poate sa faca login cu alt user
+  
+-> enter_library:
+  - Daca user-ul este logat atunci deschid conexiunea
+  - Construiesc mesajul de tip get
+  - Interpretez raspunsul de la server si preiau token-ul
+  - Daca user-ul nu este logat atunci se primeste un mesaj de eroare
+
+-> get_books:
+  - Daca user-ul are acces in biblioteca si este logat atunci deschid 
+  conexiunea
+  - Construiesc mesajul de tip get
+  - Trimit server-ului, si daca nu este vreo eroare arunci formez mesajul 
+  json cu lista de carti
+  - Daca user-ul nu are acces in biblioteca sau nu este logat atunci afisez
+   un mesaj de eroare
+  
+-> get_book:
+  - Daca user-ul are acces in biblioteca si este logat atunci citesc id-ul 
+  cartii
+  - Daca id-ul nu este numar se afiseaza un mesaj de eroare
+  - Deschid conexiunea
+  - Construiesc mesajul de tip get
+  - Trimit server-ului, si daca nu este vreo eroare arunci formez mesajul json
+   cu detaliile cartii
+  - Daca user-ul nu are acces in biblioteca sau nu este logat atunci afisez un
+   mesaj de eroare
+
+-> add_book:
+ - Daca user-ul are acces in biblioteca si este logat atunci citesc detaliile
+  cartii
+ - Deschid conexiune
+ - Construiesc un mesaj json pe care il trimit sub forma de post
+ - Daca elementele din mesaj nu sunt de forma data se afiseaza un mesaj de
+  eroare
+ - Interpretez raspunsul server-ului
+ - Daca user-ul nu are acces in biblioteca sau nu este logat atunci afisez un
+  mesaj de eroare
+
+-> delete_book:
+  - Daca user-ul are acces in biblioteca si este logat atunci citesc id-ul 
+  cartii pe care vreau sa o sterg
+  - Daca id-ul nu este numar se afiseaza un mesaj de eroare
+  - Aici ma folosesc de functia de delete
+  - Interpretez raspunsul server-ului
+  - Daca user-ul nu are acces in biblioteca sau nu este logat atunci afisez
+   un mesaj de eroare
+
+-> logout:
+  - Daca user-ul este logat se trimite mesajul de tip get server-ului
+  - Daca user-ul nu este logat se afiseaza un mesaj de eroare
+
+-> exit:
+  - Se inchide programul
+  
+-------------------------------------------------------------------------------
